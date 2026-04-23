@@ -1,26 +1,30 @@
-// api/chat.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+  // 1. Diagnostics: Log the status to the Vercel Logs
+  console.log("--- Server Log Check ---");
+  const hasKey = !!process.env.GEMINI_API_KEY;
+  console.log("Does GEMINI_API_KEY exist?", hasKey);
+  
+  if (!hasKey) {
+    return res.status(500).json({ 
+        error: "CRITICAL: GEMINI_API_KEY is undefined on the server. Check your Vercel Environment Variables." 
+    });
+  }
 
-  // Replace your existing catch/response logic in script.js with this:
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: userText })
-        });
+  // 2. If it passes, proceed with chat
+  try {
+    const { message } = req.body;
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const data = await response.json();
-
-        if (response.ok) {
-            messages.innerHTML += `<div class="message bot">${data.reply}</div>`;
-        } else {
-            // This shows the actual error from your backend
-            messages.innerHTML += `<div class="message bot" style="color:red;">Error: ${data.error || "Unknown error"}</div>`;
-        }
-        messages.scrollTop = messages.scrollHeight;
-    } catch (error) {
-        messages.innerHTML += `<div class="message bot" style="color:red;">Failed to connect to server.</div>`;
-    }
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: message }] }],
+    });
+    
+    res.status(200).json({ reply: result.response.text() });
+  } catch (error) {
+    console.error("Gemini Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+}
