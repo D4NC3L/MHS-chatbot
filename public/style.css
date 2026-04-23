@@ -1,0 +1,6 @@
+/* public/style.css */
+body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+#chat-container { width: 400px; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+#messages { height: 300px; overflow-y: auto; border-bottom: 1px solid #eee; margin-bottom: 10px; }
+input { width: 70%; padding: 8px; }
+button { padding: 8px; cursor: pointer; }
