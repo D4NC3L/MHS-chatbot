@@ -4,24 +4,23 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-  try {
-    const { message } = req.body;
-    
-    // Check if API key exists
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error("Missing GEMINI_API_KEY environment variable");
+  // Replace your existing catch/response logic in script.js with this:
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userText })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            messages.innerHTML += `<div class="message bot">${data.reply}</div>`;
+        } else {
+            // This shows the actual error from your backend
+            messages.innerHTML += `<div class="message bot" style="color:red;">Error: ${data.error || "Unknown error"}</div>`;
+        }
+        messages.scrollTop = messages.scrollHeight;
+    } catch (error) {
+        messages.innerHTML += `<div class="message bot" style="color:red;">Failed to connect to server.</div>`;
     }
-
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: `Answer this for Manacsac SHS: ${message}` }] }],
-    });
-    
-    res.status(200).json({ reply: result.response.text() });
-  } catch (error) {
-    console.error("API Error:", error); // Check Vercel logs for this
-    res.status(500).json({ error: error.message }); // This sends the error to your browser console
-  }
-}
