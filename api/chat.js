@@ -14,8 +14,8 @@ export default async function handler(req, res) {
       
       KNOWLEDGE BASE:
       - School Name: Manacsac Senior High School
-      - Website: [INSERT YOUR SCHOOL WEBSITE LINK HERE]
-      - Location: [Insert Location if known]
+      - Website: [https://www.facebook.com/manacsachighschool]
+      - Location: [Manacasac Guimba Nueva Ecija]
       
       CORE FAQs:
       1. Enrollment: Requires Grade 10 completion, PSA Birth Certificate, and Form 138.
